@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
     'http://rubygems.org/gems/genesisreactor'
   s.license       = 'MIT'
   s.add_runtime_dependency 'eventmachine'
-  s.add_runtime_dependency 'em-http-server'
+  s.add_runtime_dependency 'eventmachine_httpserver'
   s.add_runtime_dependency 'em-http-request'
   s.add_runtime_dependency 'snmp'
   s.add_development_dependency 'fakeweb'

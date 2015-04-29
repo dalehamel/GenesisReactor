@@ -1,32 +1,28 @@
-require 'em-http-server'
+require 'genesis_server'
+require 'evma_httpserver'
 
-class HTTPServer < EM::HttpServer::Server
-    def initialize(a)
-      super
-      puts a
-    end
+class HTTPServer < EM::Connection
+  include EM::HttpServer
+  include GenesisServer
 
-    def process_http_request
-          puts  @http_request_method
-          puts  @http_request_uri
-          puts  @http_query_string
-          puts  @http_protocol
-          puts  @http_content
-          puts  @http[:cookie]
-          puts  @http[:content_type]
-          # you have all the http headers in this hash
-          puts  @http.inspect
+  def process_http_request
+    # the http request details are available via the following instance variables:
+    #   @http_protocol
+    #   @http_request_method
+    #   @http_cookie
+    #   @http_if_none_match
+    #   @http_content_type
+    #   @http_path_info
+    #   @http_request_uri
+    #   @http_query_string
+    #   @http_post_content
+    #   @http_headers
 
-          response = EM::DelegatedHttpResponse.new(self)
-          response.status = 200
-          response.content_type 'text/html'
-          response.content = 'It works'
-          response.send_response
-    end
-
-    def http_request_errback e
-      # printing the whole exception
-      puts e.inspect
-    end
+    response = EM::DelegatedHttpResponse.new(self)
+    response.status = 200
+    response.content_type 'text/html'
+    response.content = '<center><h1>Hi there</h1></center>'
+    response.send_response
+  end
 
 end

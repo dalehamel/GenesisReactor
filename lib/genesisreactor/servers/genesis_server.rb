@@ -13,7 +13,7 @@ module GenesisServer
     def start(port, routes)
       fail unless self.validate
       @channel = EM::Channel.new
-      EM.start_server '127.0.0.1', port, self do |conn|
+      EM.start_server '0.0.0.0', port, self do |conn|
         conn.channel = @channel
         conn.routes = routes[self.slug]
       end
