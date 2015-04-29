@@ -11,19 +11,23 @@ require 'httpserver'
 
 # Main reactor class
 class GenesisReactor
+
   # FIXME: pass arguments in here
-  def initialize
-    @poolsize = 10000 # maximum concurrency - larger = longer boot and shutdown time
+  def initialize(**kwargs)
+    @poolsize = kwargs[:threads] || 10000 # maximum concurrency - larger = longer boot and shutdown time
+    puts @poolsize
     @routes = {}
     @handlers = {}
     @agents = {}
+    @channels = {}
   end
 
   # FIXME: replace type argument with inferred type based on class name
   # FIXME: come up with a strategy for ensuring only one route is published
-  def register_route(type, match, method)
+  def register_route(type, verb, match, method)
     @routes[type] ||= {}
-    @routes[type][match] = method
+    @routes[type][verb] ||= {}
+    @routes[type][verb][match] = method
   end
 
   # FIXME: replace type argument with inferred type based on class name
@@ -42,25 +46,27 @@ class GenesisReactor
     EM.run do
 
       EM.threadpool_size = @poolsize
-      @echo_channel = EchoServer.start(10000, @routes)
-      # FIXME: for ports
-      EM.start_server '127.0.0.1', 10001, HTTPServer, 'foo'
+      @channels[EchoServer.slug] = EchoServer.start(10000, @routes)
+      @channels[HTTPServer.slug] = HTTPServer.start(8080, @routes)
 
       initialize_handlers
       initialize_agents
+      initialize_sighandlers
       puts 'Genesis Reactor initialized'
     end
   end
 
   private
 
-  def background (&blocking)
-    proc { EM.defer(blocking) }.call
+  def initialize_sighandlers
+    trap(:INT)  {"Got interrupt"; EM.stop(); exit }
+    trap(:TERM) {"Got term";      EM.stop(); exit }
+    trap(:KILL) {"Got kill";      EM.stop(); exit }
   end
 
   def initialize_agents
     EM.add_periodic_timer(1) do # test
-      background do
+      EM.defer do
         puts "Timer fired"
         sleep 5
         puts "Done"
@@ -71,12 +77,10 @@ class GenesisReactor
   # Set up subscriptions to handlers
   def initialize_handlers
     @handlers.each do |type, handlers|
-      type_channel_symbol = "@#{type}_channel"
-      if instance_variable_defined?(type_channel_symbol)
-        type_channel = instance_variable_get(type_channel_symbol)
+      if channel = @channels[type]
         handlers.each do |handler|
-          type_channel.subscribe do |message|
-            background do
+          channel.subscribe do |message|
+            EM.defer do
               send(handler, message)
             end
           end
