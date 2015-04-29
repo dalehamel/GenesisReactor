@@ -1,13 +1,15 @@
 require 'find'
 require 'eventmachine'
 
-Find.find(File.join(File.dirname(__FILE__), 'genesisreactor')) do |f|
+Find.find(File.join(File.dirname(File.dirname(__FILE__)), 'lib')) do |f|
   $LOAD_PATH << f if File.directory? f
 end
 
+# FIXME refactor this file to jsut be a small wrapper
+# Move all the actual code into genesisreactor/genesis_reactor.rb
+
 require 'echoserver'
 require 'httpserver'
-
 
 # Main reactor class
 class GenesisReactor
@@ -24,16 +26,16 @@ class GenesisReactor
 
   # FIXME: replace type argument with inferred type based on class name
   # FIXME: come up with a strategy for ensuring only one route is published
-  def register_route(type, verb, match, method)
+  def register_route(type, verb, match, block, args)
     @routes[type] ||= {}
     @routes[type][verb] ||= {}
-    @routes[type][verb][match] = method
+    @routes[type][verb][match] = { block:block, args:args}
   end
 
   # FIXME: replace type argument with inferred type based on class name
-  def register_handler(type, method)
+  def register_handler(type, block)
     @handlers[type] ||= []
-    @handlers[type] << method
+    @handlers[type] << block
   end
 
   # FIXME: replace type argument with inferred type based on class name
@@ -47,7 +49,7 @@ class GenesisReactor
 
       EM.threadpool_size = @poolsize
       @channels[EchoServer.slug] = EchoServer.start(10000, @routes)
-      @channels[HTTPServer.slug] = HTTPServer.start(8080, @routes)
+      @channels['http'] = HttpServer.start(8080, @routes)
 
       initialize_handlers
       initialize_agents
@@ -81,7 +83,7 @@ class GenesisReactor
         handlers.each do |handler|
           channel.subscribe do |message|
             EM.defer do
-              send(handler, message)
+              handler.call(message)
             end
           end
         end

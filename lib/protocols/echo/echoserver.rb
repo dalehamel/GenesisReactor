@@ -6,9 +6,10 @@ class EchoServer < EM::Connection
   def receive_data(data)
     @channel << data
     @routes.each do |verb, matchdata|
-      if verb == 'say'
-        matchdata.each do |pattern, method|
-          send_data send(method, data) if data =~ pattern
+      case verb
+      when 'say'
+        matchdata.each do |pattern, blockdata|
+          send_data blockdata[:block].call(data) if data =~ pattern
         end
       end
     end
