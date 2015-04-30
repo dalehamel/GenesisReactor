@@ -1,9 +1,11 @@
 require 'genesis_server'
-require 'sinatra/base'
+require 'sinatra/async'
 require 'thin'
+
 
 class HttpServer < Sinatra::Base
 
+  register Sinatra::Async
   # FIXME - need a way to refactor this somehow to share with GenesisServer
   def self.start(port, routes)
 
@@ -37,7 +39,43 @@ class HttpServer < Sinatra::Base
   # def register_route
   #   send(:verb, opts, &block)
   # end
-  get '/foo' do
-    @channel << 'foo bar'
+  # we'll want to transparently translate them to their async versions
+  aget '/foo' do
+    @channel << 'foo'
+    body 'foo'
   end
+
+  aget '/bar' do
+    @channel << 'bar'
+    sleep 5
+    body 'bar'
+  end
+
+  helpers do
+    # Enable partial template rendering
+    def partial (template, locals = {})
+      erb(template, :layout => false, :locals => locals)
+    end
+
+    # Define our asynchronous scheduling mechanism, could be anything
+    # Chose EM.defer for simplicity
+    # This powers our asynchronous requests, and keeps us from blocking the main thread.
+    def native_async_schedule(&b)
+      EM.defer(&b)
+    end
+
+    # Needed to properly catch exceptions in async threads
+    def handle_exception!(context)
+      if context.message == "Sinatra::NotFound"
+        error_msg = "Resource #{request.path} does not exist"
+        puts error_msg
+        ahalt(404, error_msg)
+      else
+        puts context.message
+        puts context.backtrace.join("\n")
+        ahalt(500,"Uncaught exception occurred")
+      end
+    end
+  end
+
 end

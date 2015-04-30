@@ -2,9 +2,9 @@ PATH
   remote: .
   specs:
     genesisreactor (0.0.0)
+      async_sinatra
       em-http-request
       eventmachine
-      sinatra
       snmp
       thin
 
@@ -12,6 +12,9 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.8)
+    async_sinatra (1.1.0)
+      rack (>= 1.4.1)
+      sinatra (>= 1.3.2)
     cookiejar (0.3.2)
     daemons (1.1.9)
     diff-lcs (1.2.5)
