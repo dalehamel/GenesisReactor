@@ -33,6 +33,12 @@ class HttpServer < Sinatra::Base
     @channel = kwargs[:channel] || nil
   end
 
+  def register_route(verb, opts, &block)
+    async_verb = "a#{verb}"
+    verb = async_verb if respond_to? async_verb
+    send(verb, opts, &block)
+  end
+
   # FIXME: need a way to define routes in handler class...
   # Idea: create a helper that accepts the method (verb - get, etc), the args, and the block - then just call it.
   # eg;  post(path, opts = {}, &bk) from sinatra.rb

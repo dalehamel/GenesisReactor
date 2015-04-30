@@ -1,40 +1,42 @@
 class GenesisHandler
-
   def initialize(genesis)
     @genesis = genesis
-    add_routes
-    add_handlers
+    (self.class.routes || {}).each do |match, data|
+      route(match, data[:verb], data[:opts]) { data[:block].call }
+    end
+    (self.class.handlers || []).each do |handler|
+      handle { handler[:block].call }
+    end
   end
 
   # Register handler
-  def handler(&block)
-    @genesis.register_handler(slug, block)
+  def handle(&block)
+    @genesis.register_handler(self.class.protocol, block)
   end
 
   # Register route
-  def route(match, **kwargs, &block)
-    @genesis.register_route(slug, __callee__.to_s, match, block, kwargs)
+  def route(match, verb, opts={}, &block)
+    @genesis.register_route(self.class.protocol, verb, match, opts, &block) # FIXME say
   end
 
-  # Add a routeable verb
-  def self.route(name)
-    alias_method name, :route
-  end
+  class << self
+    attr_accessor :routes, :handlers, :protocol
 
-protected
+    def register_route(match, opts={}, &block)
+      @routes ||= {}
+      @routes[match] = {verb: __callee__.to_s, opts: opts, block: block}
+    end
 
-  # abstract
-  def add_routes
-  end
+    def register_handler(*args, &block)
+      @handlers ||= []
+      @handlers << { block: block}
+    end
 
-  # abstract
-  def add_handlers
-  end
-
-private
-
-  def slug # add to base class
-    self.class.name.downcase.gsub('handler','')
+    def register_protocol(protocol)
+      @protocol = protocol.to_s
+    end
   end
 
 end
+
+
