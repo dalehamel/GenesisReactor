@@ -2,7 +2,7 @@ class GenesisHandler
   def initialize(genesis)
     @genesis = genesis
     (self.class.routes || {}).each do |match, data|
-      route(match, data[:verb], data[:opts]) { data[:block].call }
+      route(match, data[:verb], data[:opts], data[:block])
     end
     (self.class.handlers || []).each do |handler|
       handle { handler[:block].call }
@@ -15,8 +15,8 @@ class GenesisHandler
   end
 
   # Register route
-  def route(match, verb, opts={}, &block)
-    @genesis.register_route(self.class.protocol, verb, match, opts, &block) # FIXME say
+  def route(match, verb, opts={}, block)
+    @genesis.register_route(self.class.protocol, verb, match, opts, block)
   end
 
   class << self
@@ -35,6 +35,7 @@ class GenesisHandler
     def register_protocol(protocol)
       @protocol = protocol.to_s
     end
+    alias_method :handle, :register_handler
   end
 
 end

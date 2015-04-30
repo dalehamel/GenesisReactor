@@ -26,7 +26,7 @@ class GenesisReactor
 
   # FIXME: replace type argument with inferred type based on class name
   # FIXME: come up with a strategy for ensuring only one route is published
-  def register_route(type, verb, match, args, &block)
+  def register_route(type, verb, match, args, block)
     @routes[type] ||= {}
     @routes[type][verb] ||= {}
     @routes[type][verb][match] = { block:block, args:args}

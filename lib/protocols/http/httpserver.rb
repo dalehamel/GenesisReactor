@@ -10,7 +10,7 @@ class HttpServer < Sinatra::Base
   def self.start(port, routes)
 
     channel = EM::Channel.new
-    app = self.new(channel:channel)
+    app = self.new(channel:channel, routes:routes['http'])
 
     dispatch = Rack::Builder.app do
       map '/' do
@@ -31,30 +31,28 @@ class HttpServer < Sinatra::Base
   def initialize(app = nil, **kwargs)
     super(app)
     @channel = kwargs[:channel] || nil
+    @extended_routes = kwargs[:routes] || {}
+    initialize_routes
+
   end
 
-  def register_route(verb, opts, &block)
+private
+  def initialize_routes
+
+    if routes = @extended_routes
+      routes.each do |verb, matches|
+        matches.each do |match, data|
+          register_route(verb, match, data[:args], data[:block])
+        end
+      end
+    end
+  end
+
+  def register_route(verb, match, opts, block)
     async_verb = "a#{verb}"
-    verb = async_verb if respond_to? async_verb
-    send(verb, opts, &block)
-  end
-
-  # FIXME: need a way to define routes in handler class...
-  # Idea: create a helper that accepts the method (verb - get, etc), the args, and the block - then just call it.
-  # eg;  post(path, opts = {}, &bk) from sinatra.rb
-  # def register_route
-  #   send(:verb, opts, &block)
-  # end
-  # we'll want to transparently translate them to their async versions
-  aget '/foo' do
-    @channel << 'foo'
-    body 'foo'
-  end
-
-  aget '/bar' do
-    @channel << 'bar'
-    sleep 5
-    body 'bar'
+    verb = async_verb if self.class.respond_to? async_verb
+    puts verb
+    self.class.send(verb, match, opts, &block)
   end
 
   helpers do
