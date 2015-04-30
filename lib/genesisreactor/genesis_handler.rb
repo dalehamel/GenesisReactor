@@ -5,12 +5,12 @@ class GenesisHandler
       route(match, data[:verb], data[:opts], data[:block])
     end
     (self.class.handlers || []).each do |handler|
-      handle { handler[:block].call }
+      handle(handler[:block])
     end
   end
 
   # Register handler
-  def handle(&block)
+  def handle(block)
     @genesis.register_handler(self.class.protocol, block)
   end
 

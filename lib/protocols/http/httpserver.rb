@@ -7,10 +7,13 @@ class HttpServer < Sinatra::Base
 
   register Sinatra::Async
   # FIXME - need a way to refactor this somehow to share with GenesisServer
+  # (make it accept a block if given)
   def self.start(port, routes)
 
-    channel = EM::Channel.new
-    app = self.new(channel:channel, routes:routes['http'])
+    @channel = EM::Channel.new
+
+###########################################################
+    app = self.new(channel:@channel, routes:routes['http'])
 
     dispatch = Rack::Builder.app do
       map '/' do
@@ -24,19 +27,23 @@ class HttpServer < Sinatra::Base
       Host:   '0.0.0.0',
       Port:   port,
     })
+###########################################################
 
-    return channel
+    return @channel
   end
 
+  # Inject the channel and extended routes
   def initialize(app = nil, **kwargs)
     super(app)
     @channel = kwargs[:channel] || nil
     @extended_routes = kwargs[:routes] || {}
     initialize_routes
-
   end
 
 private
+
+  # Register all routes provided
+  # FIXME: route's can easily be accidentally shadowed
   def initialize_routes
 
     if routes = @extended_routes
@@ -48,10 +55,11 @@ private
     end
   end
 
+  # Injects a route into the sinatra class
   def register_route(verb, match, opts, block)
-    async_verb = "a#{verb}"
-    verb = async_verb if self.class.respond_to? async_verb
-    puts verb
+    async_verb = "a#{verb}" # if an async route exists already, use that
+    # FIXME: monkey-patch or fork sinatra-async to make all routes async
+    verb = async_verb if self.class.respond_to? async_verb # fallback to synchronous route :(
     self.class.send(verb, match, opts, &block)
   end
 
