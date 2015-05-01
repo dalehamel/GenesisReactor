@@ -10,10 +10,11 @@ module GenesisServer
   end
 
   module ClassMethods
-    def start(port, routes)
+    def start(port, routes, **kwargs)
       @port = port
       @routes = routes
       @channel = EM::Channel.new
+      @args = kwargs
 
       # Allow a custom, non EM, server to be run
       if block_given?
@@ -29,6 +30,7 @@ module GenesisServer
       return @channel
     end
 
+    # FIXME: nuke this shit
     def slug
       self.name.downcase.gsub('server','')
     end

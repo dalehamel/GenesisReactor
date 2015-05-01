@@ -8,8 +8,10 @@ end
 # FIXME refactor this file to jsut be a small wrapper
 # Move all the actual code into genesisreactor/genesis_reactor.rb
 
+# FIXME make the inclusion of these modular... somehow
 require 'echoserver'
 require 'httpserver'
+require 'snmpserver'
 
 # Main reactor class
 class GenesisReactor
@@ -48,8 +50,11 @@ class GenesisReactor
     EM.run do
 
       EM.threadpool_size = @poolsize
+
+      # FIXME make the starting of these servers more modular
       @channels[EchoServer.slug] = EchoServer.start(10000, @routes)
       @channels['http'] = HttpServer.start(8080, @routes) { HttpServer.start_server }
+      @channels['snmp'] = SnmpServer.start(1061, @routes) { SnmpServer.start_server }
 
       initialize_handlers
       initialize_agents
