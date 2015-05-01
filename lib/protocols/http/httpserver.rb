@@ -5,15 +5,12 @@ require 'thin'
 
 class HttpServer < Sinatra::Base
 
+  include GenesisServer
   register Sinatra::Async
-  # FIXME - need a way to refactor this somehow to share with GenesisServer
-  # (make it accept a block if given)
-  def self.start(port, routes)
 
-    @channel = EM::Channel.new
-
-###########################################################
-    app = self.new(channel:@channel, routes:routes['http'])
+  # Block to actually start the server
+  def self.start_server
+    app = self.new(channel:@channel, routes:@routes['http'])
 
     dispatch = Rack::Builder.app do
       map '/' do
@@ -24,12 +21,9 @@ class HttpServer < Sinatra::Base
     r = Rack::Server.start({
       app:    dispatch,
       server: 'thin',
-      Host:   '0.0.0.0',
-      Port:   port,
+      host:   '0.0.0.0',
+      port:   @port,
     })
-###########################################################
-
-    return @channel
   end
 
   # Inject the channel and extended routes

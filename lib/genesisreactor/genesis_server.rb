@@ -11,11 +11,20 @@ module GenesisServer
 
   module ClassMethods
     def start(port, routes)
-      fail unless self.validate
+      @port = port
+      @routes = routes
       @channel = EM::Channel.new
-      EM.start_server '0.0.0.0', port, self do |conn|
-        conn.channel = @channel
-        conn.routes = routes[self.slug]
+
+      # Allow a custom, non EM, server to be run
+      if block_given?
+        yield
+      else
+      # But default to an EM server if nothing else is provided
+        fail unless self.validate
+        EM.start_server '0.0.0.0', port, self do |conn|
+          conn.channel = @channel
+          conn.routes = routes[self.slug]
+        end
       end
       return @channel
     end

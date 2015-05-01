@@ -49,7 +49,7 @@ class GenesisReactor
 
       EM.threadpool_size = @poolsize
       @channels[EchoServer.slug] = EchoServer.start(10000, @routes)
-      @channels['http'] = HttpServer.start(8080, @routes)
+      @channels['http'] = HttpServer.start(8080, @routes) { HttpServer.start_server }
 
       initialize_handlers
       initialize_agents
