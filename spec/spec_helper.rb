@@ -17,6 +17,35 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require_relative '../lib/genesisreactor.rb'
+require 'genesis_reactor'
+require 'echohandler'
+require 'timeout'
+require 'socket'
+
+
+def thread
+  Thread.new { yield }
+end
+
+def test_port(port)
+  with_timeout(5) do
+    sleep 1 until begin
+      !TCPSocket.new('127.0.0.1', port ).nil?
+    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+      false
+    end
+    return true
+  end
+end
+
+def with_timeout(seconds)
+  begin
+    Timeout.timeout(seconds) do
+      yield
+    end
+  rescue Timeout::Error
+  end
+end
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
