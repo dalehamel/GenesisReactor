@@ -16,13 +16,10 @@ class GenesisReactor
 
   def initialize(**kwargs)
     reset
-    @poolsize = kwargs[:threads] || 10000 # maximum concurrency - larger = longer boot and shutdown time
+    @poolsize = kwargs[:threads] || 100 # maximum concurrency - larger = longer boot and shutdown time
     @protocols = kwargs[:protocols] || {}
     register_handlers(kwargs[:handlers] || {})
-    start
   end
-
-  private
 
   def start
     EM.run do
@@ -34,6 +31,16 @@ class GenesisReactor
       puts 'Genesis Reactor initialized'
     end
   end
+
+  def running?
+    return EM.reactor_running?
+  end
+
+  def stop
+    EM.stop()
+  end
+
+  private
 
   # Reset / initialize instance variables
   def reset
