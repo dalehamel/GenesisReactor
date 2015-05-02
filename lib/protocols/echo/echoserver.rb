@@ -1,8 +1,11 @@
 require 'eventmachine'
+
 require 'genesis_server'
+require 'echoprotocol'
 
 class EchoServer < EM::Connection
   include GenesisServer
+  include EchoProtocol
   def receive_data(data)
     @channel << data
     @routes.each do |verb, matchdata|

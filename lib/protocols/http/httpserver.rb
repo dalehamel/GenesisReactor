@@ -1,16 +1,18 @@
-require 'genesis_server'
 require 'sinatra/async'
 require 'thin'
 
+require 'genesis_server'
+require 'httpprotocol'
 
 class HttpServer < Sinatra::Base
 
   include GenesisServer
+  include HttpProtocol
   register Sinatra::Async
 
   # Block to actually start the server
   def self.start_server
-    app = self.new(channel:@channel, routes:@routes['http'])
+    app = self.new(channel:@channel, routes:@routes)
 
     dispatch = Rack::Builder.app do
       map '/' do

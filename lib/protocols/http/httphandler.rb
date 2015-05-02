@@ -1,7 +1,9 @@
 require 'genesis_handler'
+require 'httpprotocol'
 
-class HTTPHandler < GenesisHandler
+class HttpHandler < GenesisHandler
 
+  include HttpProtocol
   #register_protocol :echo # fixme - abstract out protocol recognition to base handler
   class << self
     alias_method :get, :register_route

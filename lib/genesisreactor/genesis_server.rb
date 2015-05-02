@@ -5,12 +5,11 @@ module GenesisServer
   attr_accessor :routes, :channel
 
   def self.included base
-    base.send :include, InstanceMethods
     base.extend ClassMethods
   end
 
   module ClassMethods
-    def start(port, routes, **kwargs)
+    def start(port, routes, **kwargs, &block)
       @port = port
       @routes = routes
       @channel = EM::Channel.new
@@ -21,27 +20,12 @@ module GenesisServer
         yield
       else
       # But default to an EM server if nothing else is provided
-        fail unless self.validate
         EM.start_server '0.0.0.0', port, self do |conn|
           conn.channel = @channel
-          conn.routes = routes[self.slug]
+          conn.routes = @routes
         end
       end
       return @channel
     end
-
-    # FIXME: nuke this shit
-    def slug
-      self.name.downcase.gsub('server','')
-    end
-
-    # All subclasses must have a name ending with 'Server'
-    def validate
-      return self.name =~ /^.*Server$/
-    end
-  end
-
-  # stub
-  module InstanceMethods
   end
 end

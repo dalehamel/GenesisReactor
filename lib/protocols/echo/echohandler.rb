@@ -1,8 +1,10 @@
 require 'genesis_handler'
+require 'echoprotocol'
 
 class EchoHandler < GenesisHandler
 
-  #register_protocol :echo # fixme - abstract out protocol recognition to base handler
+  include EchoProtocol
+
   class << self
     alias_method :say, :register_route
   end
