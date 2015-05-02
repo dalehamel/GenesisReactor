@@ -8,11 +8,6 @@ end
 # FIXME refactor this file to jsut be a small wrapper setting up include path
 # Move all the actual code into genesisreactor/genesis_reactor.rb
 
-# FIXME make the inclusion of these modular... somehow
-#require 'echoserver'
-#require 'httpserver'
-#require 'snmpserver'
-
 ## We can dynamically adjust the threadpool like below, if we want to.
 ## It should be possible to make the threadpool elastic very easily, though this may impact performance
 #module EventMachine
@@ -50,8 +45,6 @@ class GenesisReactor
   def start
     EM.run do
 
-      # FIXME make the starting of these servers more modular
-#      @channels[EchoServer.slug] = EchoServer.start(10000, @routes)
 #      @channels['http'] = HttpServer.start(8080, @routes) { HttpServer.start_server }
 #      @channels['snmp'] = SnmpServer.start(1061, @routes) { SnmpServer.start_server }
       initialize_servers
@@ -122,7 +115,6 @@ class GenesisReactor
   # Registers all handlers
   def register_handlers(handlers)
     handlers.each do |handler|
-
       (handler.routes || {}).each do |match, data|
         register_route(handler.protocol, data[:verb], match, data[:opts], data[:block])
       end

@@ -12,8 +12,7 @@ class HttpServer < Sinatra::Base
 
   # Block to actually start the server
   def self.start_server
-    app = self.new(channel:@channel, routes:@routes)
-
+    app = self.new(channel:@channel, routes:@handle_routes)
     dispatch = Rack::Builder.app do
       map '/' do
         run app

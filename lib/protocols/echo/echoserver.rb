@@ -8,7 +8,7 @@ class EchoServer < EM::Connection
   include EchoProtocol
   def receive_data(data)
     @channel << data
-    @routes.each do |verb, matchdata|
+    @handle_routes.each do |verb, matchdata|
       case verb
       when 'say'
         matchdata.each do |pattern, blockdata|

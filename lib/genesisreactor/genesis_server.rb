@@ -2,7 +2,7 @@ require 'eventmachine'
 
 # Abstract base class for all servers
 module GenesisServer
-  attr_accessor :routes, :channel
+  attr_accessor :handle_routes, :channel
 
   def self.included base
     base.extend ClassMethods
@@ -11,7 +11,7 @@ module GenesisServer
   module ClassMethods
     def start(port, routes, **kwargs, &block)
       @port = port
-      @routes = routes
+      @handle_routes = routes
       @channel = EM::Channel.new
       @args = kwargs
 
@@ -22,7 +22,7 @@ module GenesisServer
       # But default to an EM server if nothing else is provided
         EM.start_server '0.0.0.0', port, self do |conn|
           conn.channel = @channel
-          conn.routes = @routes
+          conn.handle_routes = @handle_routes
         end
       end
       return @channel
