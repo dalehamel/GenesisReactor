@@ -10,6 +10,7 @@
 #end
 
 require 'eventmachine'
+
 # Main reactor class
 class GenesisReactor
 
@@ -18,10 +19,23 @@ class GenesisReactor
     @poolsize = kwargs[:threads] || 10000 # maximum concurrency - larger = longer boot and shutdown time
     @protocols = kwargs[:protocols] || {}
     register_handlers(kwargs[:handlers] || {})
-    initialize_protocols
-    initialize_threadpool
+    start
   end
 
+  private
+
+  def start
+    EM.run do
+      initialize_protocols
+      initialize_threadpool
+      initialize_servers
+      initialize_agents
+      initialize_sighandlers
+      puts 'Genesis Reactor initialized'
+    end
+  end
+
+  # Reset / initialize instance variables
   def reset
     @protocols = {}
     @servers = {}
@@ -31,22 +45,14 @@ class GenesisReactor
     @channels = {}
   end
 
-  def start
-    EM.run do
-      initialize_servers
-      initialize_agents
-      initialize_sighandlers
-      puts 'Genesis Reactor initialized'
-    end
-  end
-
-  private
+  # Initialize signal handlers (required because of thin)
   def initialize_sighandlers
     trap(:INT)  {"Got interrupt"; EM.stop(); exit }
     trap(:TERM) {"Got term";      EM.stop(); exit }
     trap(:KILL) {"Got kill";      EM.stop(); exit }
   end
 
+  # Initialize servers for each protocol
   def initialize_servers
     @protocols.each do |protocol, _|
       server = @servers[protocol.protocol]
@@ -60,6 +66,7 @@ class GenesisReactor
     initialize_handlers
   end
 
+  # Initialize protocols to be handled
   def initialize_protocols
     @protocols.each do |protocol, _|
       server = protocol.load
@@ -67,6 +74,7 @@ class GenesisReactor
     end
   end
 
+  # Sets the initial size of the threadpool
   def initialize_threadpool
     EM.threadpool_size = @poolsize # move this to initializer so we don't have to allocate while running
   end
