@@ -1,8 +1,10 @@
 require 'genesis_handler'
+require 'snmpprotocol'
 
 class SnmpHandler < GenesisHandler
 
-  #register_protocol :echo # fixme - abstract out protocol recognition to base handler
+  include SnmpProtocol
+
   class << self
     alias_method :trap, :register_route
   end

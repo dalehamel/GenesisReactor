@@ -22,14 +22,12 @@ end
 # Main reactor class
 class GenesisReactor
 
-  # FIXME: pass arguments in here
   def initialize(**kwargs)
     reset
     @poolsize = kwargs[:threads] || 10000 # maximum concurrency - larger = longer boot and shutdown time
     @protocols = kwargs[:protocols] || {}
     register_handlers(kwargs[:handlers] || {})
     initialize_protocols
-    initialize_handlers
     initialize_threadpool
   end
 
@@ -44,9 +42,6 @@ class GenesisReactor
 
   def start
     EM.run do
-
-#      @channels['http'] = HttpServer.start(8080, @routes) { HttpServer.start_server }
-#      @channels['snmp'] = SnmpServer.start(1061, @routes) { SnmpServer.start_server }
       initialize_servers
       initialize_agents
       initialize_sighandlers
@@ -71,8 +66,8 @@ class GenesisReactor
         server[:server].start(server[:port], @routes[protocol.protocol], &block)
       end
     end
+    initialize_handlers
   end
-
 
   def initialize_protocols
     @protocols.each do |protocol, _|
@@ -84,7 +79,6 @@ class GenesisReactor
   def initialize_threadpool
     EM.threadpool_size = @poolsize # move this to initializer so we don't have to allocate while running
   end
-
 
   # FIXME actually do this
   def initialize_agents

@@ -1,10 +1,13 @@
 require 'eventmachine'
 require 'snmp'
+
 require 'genesis_server'
+require 'snmpprotocol'
 
 
 class SnmpServer
   include GenesisServer
+  include SnmpProtocol
 
   def self.start_server
     commstr = @args[:community] || 'public'
@@ -14,6 +17,7 @@ class SnmpServer
           # Add routes here
           # Also put into channel
           # Test handler for channel
+          puts snmp_trap
           @channel << snmp_trap
           puts 'trapped'
         end
