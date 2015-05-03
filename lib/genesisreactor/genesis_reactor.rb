@@ -49,6 +49,7 @@ class GenesisReactor
 
   # Stop the reactor
   def stop
+    puts "Shutting down"
     EM.stop()
   end
 
@@ -64,11 +65,11 @@ class GenesisReactor
     @channels = {}
   end
 
-  # Initialize signal handlers (required because of thin)
+  # Initialize signal handlers to cleanly shutdown
   def initialize_sighandlers
-    trap(:INT)  {"Got interrupt"; EM.stop(); exit }
-    trap(:TERM) {"Got term";      EM.stop(); exit }
-    trap(:KILL) {"Got kill";      EM.stop(); exit }
+    trap(:INT)  {puts "Got interrupt"; stop(); exit }
+    trap(:TERM) {puts "Got term";      stop(); exit }
+    trap(:KILL) {puts "Got kill";      stop(); exit }
   end
 
   # Initialize servers for each protocol
@@ -95,7 +96,7 @@ class GenesisReactor
 
   # Sets the initial size of the threadpool
   def initialize_threadpool
-    EM.threadpool_size = @poolsize # move this to initializer so we don't have to allocate while running
+    EM.threadpool_size = @poolsize
   end
 
   # FIXME actually do this

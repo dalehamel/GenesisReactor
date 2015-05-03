@@ -16,6 +16,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'async_sinatra'
   s.add_runtime_dependency 'thin'
   s.add_runtime_dependency 'snmp'
-  s.add_development_dependency 'fakeweb'
-  s.add_development_dependency 'rspec-eventmachine'
+  s.add_development_dependency 'rspec'
 end

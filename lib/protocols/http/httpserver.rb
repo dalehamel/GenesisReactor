@@ -4,6 +4,17 @@ require 'thin'
 require 'genesis_server'
 require 'httpprotocol'
 
+# Monkey-patch async sinatra to support all verb sinatra supports
+# Can remove if this patch gets merged:
+# https://github.com/raggi/async_sinatra/pull/39
+module Sinatra
+  module Async
+    def apatch(path, opts = {}, &bk)   aroute 'PATCH',   path, opts, &bk end
+    def alink(path, opts = {}, &bk)    aroute 'LINK',    path, opts, &bk end
+    def aunlink(path, opts = {}, &bk)  aroute 'UNLINK',  path, opts, &bk end
+  end
+end
+
 class HttpServer < Sinatra::Base
 
   include GenesisServer
@@ -19,12 +30,9 @@ class HttpServer < Sinatra::Base
       end
     end
 
-    r = Rack::Server.start({
-      app:    dispatch,
-      server: 'thin',
-      host:   '0.0.0.0',
-      port:   @port,
-    })
+    # Since Thin is backed by EventMachine's TCPserver anyways,
+    # This is just a TCPServer like any other - running inside the same EventMachine!
+    Thin::Server.new(@port, '0.0.0.0', dispatch).backend.start
   end
 
   # Inject the channel and extended routes
@@ -52,10 +60,8 @@ private
 
   # Injects a route into the sinatra class
   def register_route(verb, match, opts, block)
-    async_verb = "a#{verb}" # if an async route exists already, use that
-    # FIXME: monkey-patch or fork sinatra-async to make all routes async
-    verb = async_verb if self.class.respond_to? async_verb # fallback to synchronous route :(
-    self.class.send(verb, match, opts, &block)
+    async_verb = "a#{verb}" # force verb to async verb
+    self.class.send(async_verb, match, opts, &block)
   end
 
   helpers do
