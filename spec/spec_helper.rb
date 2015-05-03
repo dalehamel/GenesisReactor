@@ -22,23 +22,30 @@ require 'echohandler'
 require 'timeout'
 require 'socket'
 
-
-TCPSocket = EventMachine::Synchrony::TCPSocket
+# Wait for the specified amount of time
+# the 'oren' function
+def wait_async(time)
+  EM::Synchrony.sleep(time)
+end
 
 # Helper method to test a port for connectivity
 def test_port(port)
   begin
-    !TCPSocket.new('127.0.0.1', port ).nil?
+    !EventMachine::Synchrony::TCPSocket.new('127.0.0.1', port ).nil?
   rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
     false
   end
 end
 
 # Helper to send messages to a port
+# Will wait for a reply until the socket is closed by server
 def send_to_port(message, port)
-  s = TCPSocket.new '127.0.0.1', port
+  s = EventMachine::Synchrony::TCPSocket.new '127.0.0.1', port
   s.write message
-  data = s.read_nonblock(50)
+  data = ''
+  while recv = s.read(1)
+    data += recv
+  end
   s.close
   return data
 end
@@ -54,6 +61,7 @@ def with_timeout(seconds)
 end
 
 # Include this module in a spec to run all examples within a synchrony block.
+# http://blog.carbonfive.com/2011/02/03/raking-and-testing-with-eventmachine/
 module SynchronySpec
   def self.append_features(mod)
     mod.class_eval %[

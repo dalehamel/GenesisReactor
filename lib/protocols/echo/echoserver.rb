@@ -16,5 +16,6 @@ class EchoServer < EM::Connection
         end
       end
     end
+    close_connection_after_writing
   end
 end

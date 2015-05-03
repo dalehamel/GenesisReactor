@@ -27,7 +27,7 @@ RSpec.describe GenesisReactor do
   context 'handlers' do
 
     it 'can register a route for a protocol' do
-      class MyEchoHandler < EchoHandler
+      class TestRegisterRouteEchoHandler < EchoHandler
         say /test/ do |message|
           "test handler routed #{message}"
         end
@@ -37,7 +37,7 @@ RSpec.describe GenesisReactor do
         protocols: {
           EchoProtocol => port
         },
-        handlers: [ MyEchoHandler ]
+        handlers: [ TestRegisterRouteEchoHandler ]
       )
 
       reactor.run
@@ -46,7 +46,7 @@ RSpec.describe GenesisReactor do
     end
 
     it 'can register a subscriber for a protocol' do
-      class MyEchoHandler < EchoHandler
+      class TestRegisterSubscriberEchoHandler < EchoHandler
         handle 'test' do |message|
           puts "test handler got #{message}"
         end
@@ -56,17 +56,16 @@ RSpec.describe GenesisReactor do
         protocols: {
           EchoProtocol => port
         },
-        handlers: [ MyEchoHandler ]
+        handlers: [ TestRegisterSubscriberEchoHandler ]
       )
 
       reactor.run
       expect{
         send_to_port('test', port)
-        EM::Synchrony.sleep(1)
-      }.to output(/test handler got test/).to_stdout
+        wait_async(1)
+      }.to output("test handler got test\n").to_stdout
 
     end
-
 
     it 'can register multiple subscribers for a protocol' do
     end
@@ -77,7 +76,6 @@ RSpec.describe GenesisReactor do
     it 'can register multiple handlers for a protocol' do
     end
   end
-
 
 end
 
