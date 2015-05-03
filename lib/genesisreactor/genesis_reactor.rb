@@ -67,7 +67,6 @@ class GenesisReactor
   # Initialize signal handlers to cleanly shutdown
   def initialize_sighandlers
     trap(:INT)  do
-      puts 'Got interrupt'
       stop
       exit
     end
@@ -77,12 +76,8 @@ class GenesisReactor
   def initialize_servers
     @protocols.each do |protocol, _|
       server = @servers[protocol.protocol]
-      if server[:start].nil?
-        @channels[protocol.protocol] = server[:server].start(server[:port], @routes[protocol.protocol])
-      else
-        block = server[:start]
-        @channels[protocol.protocol] = server[:server].start(server[:port], @routes[protocol.protocol], &block)
-      end
+      block = server[:start]
+      @channels[protocol.protocol] = server[:server].start(server[:port], @routes[protocol.protocol], &block)
     end
     initialize_subscribers
   end

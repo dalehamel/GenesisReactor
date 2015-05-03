@@ -10,14 +10,14 @@ module GenesisServer
 
   # Methods to be injected onto the class
   module ClassMethods
-    def start(port, routes, **kwargs)
+    def start(port, routes, **kwargs, &block)
       @port = port
       @handle_routes = routes || []
       @channel = EM::Channel.new
       @args = kwargs
 
       # Allow a custom, non EM, server to be run
-      if block_given?
+      if block_given? && block
         yield
       else
         default_start

@@ -1,19 +1,17 @@
 # Testing
 
-+ Write core tests for the reactor
++ Write core tests for the reactor using echo protocol
  + Registering routes, channels etc work as expected
-+ Write tests for echo protocol
 
-+ Write tests for http protocol
- + Tests for their specific routing / subscription things
++ Write agent module and tests (try and do this TDD)
+ + Something to schedule work (schedule DSL command?)
+ + Something to make a request
+  + (think, provide accesses to snmp get/set
+  + provide access to http get/post/patch and other verbs
 
 # Next up
 
 + Implement SNMP trap handler (handle specific trap OID by decoding PDU... maybe make symbolic, maybe not)
-
-+ Write agent module and tests (try and do this TDD)
- + Something to schedule work (schedule DSL command?)
- + Something to make a request (think, provide accesses to snmp get/set)
 
 + Timeouts
   + specify timeout when instantiating (default to 60? or maybe infinite...)
@@ -22,14 +20,23 @@
     + Overriding timeouts somehow by passing argument to defer wrapper
 + Make sure that all modules force some sort of timeout somehow :wave: so that things don't block forever
 
-# HTTP
+# Gemify protocols
+
++ Make HTTP and SNMP their own gems
+
+## HTTP
 
 + Figure out template rendering (paths)
 + Port over transmuter code where relevant
 
-# Refactor
++ Write tests for http protocol
+ + Tests for their specific routing / subscription things
 
-+ Gemify protocols
+## SNMP
+
++ Make trap work for numeric OIDs (maybe symbolic... somehow)
++ Test by generating a trap
++ Make SNMP agent able to send get/set
 
 # Things to consider:
 
@@ -37,6 +44,8 @@
 + Dynamic threadpools
 
 ## Difference between subscriber and route:
+
+FIXME: update readme with this to clarify
 
 Both routes and subscribers are handlers
 
