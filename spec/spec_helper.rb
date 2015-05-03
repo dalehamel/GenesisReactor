@@ -23,27 +23,36 @@ require 'timeout'
 require 'socket'
 
 
-def thread
-  Thread.new { yield }
-end
-
+# Helper method to test a port for connectivity
 def test_port(port)
-  with_timeout(5) do
-    sleep 1 until begin
-      !TCPSocket.new('127.0.0.1', port ).nil?
-    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-      false
-    end
-    return true
+  begin
+    !TCPSocket.new('127.0.0.1', port ).nil?
+  rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+    false
   end
 end
 
+# Helper method to run a block with a timeout
 def with_timeout(seconds)
   begin
     Timeout.timeout(seconds) do
       yield
     end
   rescue Timeout::Error
+  end
+end
+
+# Include this module in a spec to run all examples within a synchrony block.
+module SynchronySpec
+  def self.append_features(mod)
+    mod.class_eval %[
+      around(:each) do |example|
+        EM.synchrony do
+          example.run
+          EM.stop
+        end
+      end
+    ]
   end
 end
 

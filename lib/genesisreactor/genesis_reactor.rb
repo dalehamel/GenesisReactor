@@ -9,7 +9,7 @@
 #
 #end
 
-require 'eventmachine'
+require 'em-synchrony'
 
 # Main reactor class
 class GenesisReactor
@@ -21,21 +21,33 @@ class GenesisReactor
     register_handlers(kwargs[:handlers] || {})
   end
 
+  # Convenience wrapper to run indefinitely as daemon
   def start
-    EM.run do
+    EM.synchrony do
+      run
+    end
+  end
+
+  # Run the reactor - must be called from EM.run or EM.synchrony
+  def run
+    if running?
       initialize_protocols
       initialize_threadpool
       initialize_servers
       initialize_agents
       initialize_sighandlers
       puts 'Genesis Reactor initialized'
+    else
+      fail 'Must run from within reactor'
     end
   end
 
+  # Check if the reactor is running
   def running?
     return EM.reactor_running?
   end
 
+  # Stop the reactor
   def stop
     EM.stop()
   end

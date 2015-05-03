@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.license       = 'MIT'
   s.add_runtime_dependency 'eventmachine'
   s.add_runtime_dependency 'em-http-request'
+  s.add_runtime_dependency 'em-synchrony'
   s.add_runtime_dependency 'async_sinatra'
   s.add_runtime_dependency 'thin'
   s.add_runtime_dependency 'snmp'

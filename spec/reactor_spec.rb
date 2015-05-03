@@ -1,28 +1,27 @@
 RSpec.describe GenesisReactor do
 
+  include SynchronySpec
+
   context 'reactor startup' do
     it 'can start a reactor' do
-      reactor = GenesisReactor.new
-      expect(reactor.running?).to be false
-
       expect {
-        with_timeout(1) { reactor.start }
+        reactor = GenesisReactor.new
+        reactor.run
       }.to output(/Genesis Reactor initialized/).to_stdout
-      expect(reactor.running?).to be false
     end
 
     it 'can run a server for a protocol' do
       port = 10000
 
-      expect(test_port(port)).to be_nil
+      expect(test_port(port)).to be false
       reactor = GenesisReactor.new(
         protocols: {
           EchoProtocol => port
         }
       )
-      thr = thread { reactor.start }
+
+      reactor.run
       expect(test_port(port)).to be true
-      Thread.kill(thr)
     end
   end
 
