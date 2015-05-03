@@ -2,8 +2,9 @@
 
 + Write core tests for the reactor
  + Registering routes, channels etc work as expected
++ Write tests for echo protocol
 
-+ Write tests for echo and http server
++ Write tests for http protocol
  + Tests for their specific routing / subscription things
 
 # Next up
@@ -35,10 +36,9 @@
 + Allow callbacks wherever we're doing defers?
 + Dynamic threadpools
 
-## Difference between handler (SUBSCRIBER) and route:
+## Difference between subscriber and route:
 
-FIXME: Rename 'handlers' to 'subscribers' for less ambiguity
-(both routes and subscribers are handlers)
+Both routes and subscribers are handlers
 
-+ Handlers don't descriminate, they can choose to ignore what they get - but they get everything
-+ Routes handle a specific subscription for that protocol
++ Subscribers listen for **any** message on a channel, and there can be many subscribers for a protocol.
++ Routes handle messages matching a specific criteria, and there may only be one route per matcher for a protocol.

@@ -47,7 +47,7 @@ RSpec.describe GenesisReactor do
 
     it 'can register a subscriber for a protocol' do
       class TestRegisterSubscriberEchoHandler < EchoHandler
-        handle 'test' do |message|
+        subscribe 'test' do |message|
           puts "test handler got #{message}"
         end
       end

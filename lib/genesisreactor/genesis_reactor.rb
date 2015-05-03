@@ -59,7 +59,7 @@ class GenesisReactor
     @protocols = {}
     @servers = {}
     @routes = {}
-    @handlers = {}
+    @subscribers = {}
     @agents = {}
     @channels = {}
   end
@@ -82,7 +82,7 @@ class GenesisReactor
         server[:server].start(server[:port], @routes[protocol.protocol], &block)
       end
     end
-    initialize_handlers
+    initialize_subscribers
   end
 
   # Initialize protocols to be handled
@@ -109,14 +109,14 @@ class GenesisReactor
 #    end
   end
 
-  # Set up subscriptions to handlers
-  def initialize_handlers
-    @handlers.each do |type, handlers|
+  # Set up subscriptions to channels
+  def initialize_subscribers
+    @subscribers.each do |type, subscribers|
       if channel = @channels[type]
-        handlers.each do |handler|
+        subscribers.each do |subscriber|
           channel.subscribe do |message|
             EM.defer do
-              handler.call(message)
+              subscriber.call(message)
             end
           end
         end
@@ -131,8 +131,8 @@ class GenesisReactor
         register_route(handler.protocol, data[:verb], match, data[:opts], data[:block])
       end
 
-      (handler.handlers || []).each do |data|
-        register_handler(handler.protocol, data[:block])
+      (handler.subscribers || []).each do |data|
+        register_subscriber(handler.protocol, data[:block])
       end
     end
   end
@@ -145,9 +145,9 @@ class GenesisReactor
   end
 
   # Registers a handler for a given protocol
-  def register_handler(protocol, block)
-    @handlers[protocol] ||= []
-    @handlers[protocol] << block
+  def register_subscriber(protocol, block)
+    @subscribers[protocol] ||= []
+    @subscribers[protocol] << block
   end
 
   # Registers an agent for a given protocol

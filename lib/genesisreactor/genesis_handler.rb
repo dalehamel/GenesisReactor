@@ -1,16 +1,16 @@
 class GenesisHandler
   class << self
-    attr_accessor :routes, :handlers
+    attr_accessor :routes, :subscribers
     def register_route(match, opts={}, &block)
       @routes[match] = {verb: __callee__.to_s, opts: opts, block: block}
     end
 
-    def register_handler(*args, &block)
-      @handlers << { block: block}
+    def register_subscriber(*args, &block)
+      @subscribers << { block: block}
     end
 
     def reset!
-      @handlers = []
+      @subscribers = []
       @routes = {}
     end
 
@@ -19,7 +19,7 @@ class GenesisHandler
       super
     end
 
-    alias_method :handle, :register_handler
+    alias_method :subscribe, :register_subscriber
   end
 
   reset!
