@@ -11,7 +11,7 @@ module GenesisServer
   module ClassMethods
     def start(port, routes, **kwargs, &block)
       @port = port
-      @handle_routes = routes
+      @handle_routes = routes || []
       @channel = EM::Channel.new
       @args = kwargs
 

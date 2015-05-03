@@ -23,6 +23,8 @@ require 'timeout'
 require 'socket'
 
 
+TCPSocket = EventMachine::Synchrony::TCPSocket
+
 # Helper method to test a port for connectivity
 def test_port(port)
   begin
@@ -30,6 +32,15 @@ def test_port(port)
   rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
     false
   end
+end
+
+# Helper to send messages to a port
+def send_to_port(message, port)
+  s = TCPSocket.new '127.0.0.1', port
+  s.write message
+  data = s.read_nonblock(50)
+  s.close
+  return data
 end
 
 # Helper method to run a block with a timeout

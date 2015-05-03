@@ -11,6 +11,11 @@ class GenesisHandler
       @handlers << { block: block}
     end
 
+    def reset!
+      @handlers = []
+      @routes = {}
+    end
+
     alias_method :handle, :register_handler
   end
 end

@@ -36,7 +36,7 @@ class GenesisReactor
       initialize_servers
       initialize_agents
       initialize_sighandlers
-      puts 'Genesis Reactor initialized'
+      return true
     else
       fail 'Must run from within reactor'
     end
@@ -100,13 +100,13 @@ class GenesisReactor
 
   # FIXME actually do this
   def initialize_agents
-    EM.add_periodic_timer(1) do # test
-      EM.defer do
-        puts "Timer fired"
-        sleep 5
-        puts "Done"
-      end
-    end
+#    EM.add_periodic_timer(1) do # test
+#      EM.defer do
+#        puts "Timer fired"
+#        sleep 5
+#        puts "Done"
+#      end
+#    end
   end
 
   # Set up subscriptions to handlers
