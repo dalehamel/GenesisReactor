@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = 'A simple hello world gem'
   s.authors     = ['Dale Hamel']
   s.email       = 'dale.hamel@srvthe.net'
-  s.files       = ["lib/genesisreactor.rb", 'lib/genesisreactor/servers/httpserver.rb', 'lib/genesisreactor/servers/echoserver.rb']
+  s.files       = ['lib/genesisreactor.rb', 'lib/genesisreactor/servers/httpserver.rb', 'lib/genesisreactor/servers/echoserver.rb']
   s.homepage    =
     'http://rubygems.org/gems/genesisreactor'
   s.license       = 'MIT'

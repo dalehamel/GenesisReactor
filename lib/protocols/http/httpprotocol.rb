@@ -1,25 +1,27 @@
+# Implement support for HTTP protocol
+# Levering sinatra_async, and the fact that thin uses eventmachine
 module HttpProtocol
-
-  def self.included base
+  def self.included(base)
     base.extend ClassMethods
   end
 
   def self.load
     require 'httpserver'
-    return HttpServer
+    HttpServer
   end
 
   def self.start_block
-    Proc.new { HttpServer.start_server }
+    proc { HttpServer.start_server }
   end
 
   def self.protocol
-    return :http
+    :http
   end
 
+  # Mehods to be injected into including class
   module ClassMethods
     def protocol
-      return HttpProtocol.protocol
+      HttpProtocol.protocol
     end
   end
 end

@@ -4,12 +4,13 @@ require 'eventmachine'
 module GenesisServer
   attr_accessor :handle_routes, :channel
 
-  def self.included base
+  def self.included(base)
     base.extend ClassMethods
   end
 
+  # Methods to be injected onto the class
   module ClassMethods
-    def start(port, routes, **kwargs, &block)
+    def start(port, routes, **kwargs)
       @port = port
       @handle_routes = routes || []
       @channel = EM::Channel.new
@@ -19,13 +20,19 @@ module GenesisServer
       if block_given?
         yield
       else
-      # But default to an EM server if nothing else is provided
-        EM.start_server '0.0.0.0', port, self do |conn|
-          conn.channel = @channel
-          conn.handle_routes = @handle_routes
-        end
+        default_start
       end
-      return @channel
+      @channel
+    end
+
+    private
+
+    def default_start
+      # But default to an EM server if nothing else is provided
+      EM.start_server '0.0.0.0', @port, self do |conn|
+        conn.channel = @channel
+        conn.handle_routes = @handle_routes
+      end
     end
   end
 end

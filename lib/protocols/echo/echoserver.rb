@@ -3,6 +3,7 @@ require 'eventmachine'
 require 'genesis_server'
 require 'echoprotocol'
 
+# Implement a test server to demonstrate functionality and facilitate testing
 class EchoServer < EM::Connection
   include GenesisServer
   include EchoProtocol

@@ -1,25 +1,26 @@
+# Implement support for SNMP protocol using pure-ruby snmp.
 module SnmpProtocol
-
-  def self.included base
+  def self.included(base)
     base.extend ClassMethods
   end
 
   def self.load
     require 'snmpserver'
-    return SnmpServer
+    SnmpServer
   end
 
   def self.start_block
-    Proc.new { SnmpServer.start_server }
+    proc { SnmpServer.start_server }
   end
 
   def self.protocol
-    return :snmp
+    :snmp
   end
 
+  # Methods to be injected into included class
   module ClassMethods
     def protocol
-      return SnmpProtocol.protocol
+      SnmpProtocol.protocol
     end
   end
 end

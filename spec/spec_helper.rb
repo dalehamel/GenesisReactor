@@ -30,34 +30,31 @@ end
 
 # Helper method to test a port for connectivity
 def test_port(port)
-  begin
-    !EventMachine::Synchrony::TCPSocket.new('127.0.0.1', port ).nil?
-  rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-    false
-  end
+  !EventMachine::Synchrony::TCPSocket.new('127.0.0.1', port).nil?
+rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+  false
 end
 
 # Helper to send messages to a port
 # Will wait for a reply until the socket is closed by server
 def send_to_port(message, port)
-  s = EventMachine::Synchrony::TCPSocket.new '127.0.0.1', port
+  s = EventMachine::Synchrony::TCPSocket.new('127.0.0.1', port)
   s.write message
   data = ''
   while recv = s.read(1)
     data += recv
   end
   s.close
-  return data
+  data
 end
 
 # Helper method to run a block with a timeout
 def with_timeout(seconds)
-  begin
-    Timeout.timeout(seconds) do
-      yield
-    end
-  rescue Timeout::Error
+  Timeout.timeout(seconds) do
+    yield
   end
+rescue Timeout::Error
+  false
 end
 
 # Include this module in a spec to run all examples within a synchrony block.

@@ -3,27 +3,17 @@ require 'thin'
 
 require 'genesis_server'
 require 'httpprotocol'
+require 'async_monkeypatch'
 
-# Monkey-patch async sinatra to support all verb sinatra supports
-# Can remove if this patch gets merged:
-# https://github.com/raggi/async_sinatra/pull/39
-module Sinatra
-  module Async
-    def apatch(path, opts = {}, &bk)   aroute 'PATCH',   path, opts, &bk end
-    def alink(path, opts = {}, &bk)    aroute 'LINK',    path, opts, &bk end
-    def aunlink(path, opts = {}, &bk)  aroute 'UNLINK',  path, opts, &bk end
-  end
-end
-
+# Implement an HTTP server using async_sinatra and thin
 class HttpServer < Sinatra::Base
-
   include GenesisServer
   include HttpProtocol
   register Sinatra::Async
 
   # Block to actually start the server
   def self.start_server
-    app = self.new(channel:@channel, routes:@handle_routes)
+    app = new(channel: @channel, routes: @handle_routes)
     dispatch = Rack::Builder.app do
       map '/' do
         run app
@@ -43,17 +33,13 @@ class HttpServer < Sinatra::Base
     initialize_routes
   end
 
-private
+  private
 
   # Register all routes provided
-  # FIXME: route's can easily be accidentally shadowed
   def initialize_routes
-
-    if routes = @extended_routes
-      routes.each do |verb, matches|
-        matches.each do |match, data|
-          register_route(verb, match, data[:args], data[:block])
-        end
+    @extended_routes.each do |verb, matches|
+      matches.each do |match, data|
+        register_route(verb, match, data[:args], data[:block])
       end
     end
   end
@@ -66,8 +52,8 @@ private
 
   helpers do
     # Enable partial template rendering
-    def partial (template, locals = {})
-      erb(template, :layout => false, :locals => locals)
+    def partial(template, locals = {})
+      erb(template, layout: false, locals: locals)
     end
 
     # Define our asynchronous scheduling mechanism, could be anything
@@ -79,16 +65,15 @@ private
 
     # Needed to properly catch exceptions in async threads
     def handle_exception!(context)
-      if context.message == "Sinatra::NotFound"
+      if context.message == 'Sinatra::NotFound'
         error_msg = "Resource #{request.path} does not exist"
         puts error_msg
         ahalt(404, error_msg)
       else
         puts context.message
         puts context.backtrace.join("\n")
-        ahalt(500,"Uncaught exception occurred")
+        ahalt(500, 'Uncaught exception occurred')
       end
     end
   end
-
 end

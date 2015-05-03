@@ -1,8 +1,8 @@
 require 'genesis_handler'
 require 'httpprotocol'
 
+# Handle various HTTP verbs
 class HttpHandler < GenesisHandler
-
   include HttpProtocol
 
   class << self
@@ -15,5 +15,4 @@ class HttpHandler < GenesisHandler
     alias_method :link, :register_route
     alias_method :unlink, :register_route
   end
-
 end

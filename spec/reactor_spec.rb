@@ -1,6 +1,5 @@
 RSpec.describe GenesisReactor do
-
-  let(:port) { 10000 }
+  let(:port) { 10_000 }
   include SynchronySpec
 
   context 'reactor can startup' do
@@ -10,7 +9,6 @@ RSpec.describe GenesisReactor do
     end
 
     it 'can run a server for a protocol' do
-
       expect(test_port(port)).to be false
 
       reactor = GenesisReactor.new(
@@ -25,8 +23,8 @@ RSpec.describe GenesisReactor do
   end
 
   context 'handlers' do
-
     it 'can register a route for a protocol' do
+      # Simple class registering one route
       class TestRegisterRouteEchoHandler < EchoHandler
         say /test/ do |message|
           "test handler routed #{message}"
@@ -37,15 +35,15 @@ RSpec.describe GenesisReactor do
         protocols: {
           EchoProtocol => port
         },
-        handlers: [ TestRegisterRouteEchoHandler ]
+        handlers: [TestRegisterRouteEchoHandler]
       )
 
       reactor.run
       expect(send_to_port('test', port)).to eq 'test handler routed test'
-
     end
 
     it 'can register a subscriber for a protocol' do
+      # Simple class registering one subscriber
       class TestRegisterSubscriberEchoHandler < EchoHandler
         subscribe 'test' do |message|
           puts "test handler got #{message}"
@@ -56,15 +54,14 @@ RSpec.describe GenesisReactor do
         protocols: {
           EchoProtocol => port
         },
-        handlers: [ TestRegisterSubscriberEchoHandler ]
+        handlers: [TestRegisterSubscriberEchoHandler]
       )
 
       reactor.run
-      expect{
+      expect do
         send_to_port('test', port)
         wait_async(1)
-      }.to output("test handler got test\n").to_stdout
-
+      end.to output("test handler got test\n").to_stdout
     end
 
     it 'can register multiple subscribers for a protocol' do
@@ -76,6 +73,4 @@ RSpec.describe GenesisReactor do
     it 'can register multiple handlers for a protocol' do
     end
   end
-
 end
-
