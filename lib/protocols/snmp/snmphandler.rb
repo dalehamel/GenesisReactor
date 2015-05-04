@@ -1,8 +1,8 @@
-require 'genesis_handler'
+require 'genesis/handler'
 require 'snmpprotocol'
 
 # Implement a handler for SNMP traps
-class SnmpHandler < GenesisHandler
+class SnmpHandler < Genesis::Handler
   include SnmpProtocol
 
   class << self

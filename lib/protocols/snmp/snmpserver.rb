@@ -1,12 +1,11 @@
-require 'eventmachine'
 require 'snmp'
 
-require 'genesis_server'
+require 'genesis/server'
 require 'snmpprotocol'
 
 # Implement an SNMP trap handling server
 class SnmpServer
-  include GenesisServer
+  include Genesis::Server
   include SnmpProtocol
 
   def self.start_server

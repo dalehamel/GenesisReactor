@@ -1,13 +1,13 @@
 require 'sinatra/async'
 require 'thin'
 
-require 'genesis_server'
+require 'genesis/server'
 require 'httpprotocol'
 require 'async_monkeypatch'
 
 # Implement an HTTP server using async_sinatra and thin
 class HttpServer < Sinatra::Base
-  include GenesisServer
+  include Genesis::Server
   include HttpProtocol
   register Sinatra::Async
 

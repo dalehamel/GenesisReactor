@@ -1,17 +1,17 @@
-RSpec.describe GenesisReactor do
+RSpec.describe Genesis::Reactor do
   let(:port) { 10_000 }
   include SynchronySpec
 
   context 'reactor can startup' do
     it 'can start a reactor' do
-      reactor = GenesisReactor.new
+      reactor = Genesis::Reactor.new
       expect(reactor.run).to be true
     end
 
     it 'can run a server for a protocol' do
       expect(test_port(port)).to be false
 
-      reactor = GenesisReactor.new(
+      reactor = Genesis::Reactor.new(
         protocols: {
           EchoProtocol => port
         }
@@ -31,7 +31,7 @@ RSpec.describe GenesisReactor do
         end
       end
 
-      reactor = GenesisReactor.new(
+      reactor = Genesis::Reactor.new(
         protocols: {
           EchoProtocol => port
         },
@@ -50,7 +50,7 @@ RSpec.describe GenesisReactor do
         end
       end
 
-      reactor = GenesisReactor.new(
+      reactor = Genesis::Reactor.new(
         protocols: {
           EchoProtocol => port
         },

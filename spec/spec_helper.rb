@@ -17,7 +17,7 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require_relative '../lib/genesisreactor.rb'
-require 'genesis_reactor'
+require 'genesis/reactor'
 require 'echohandler'
 require 'timeout'
 require 'socket'

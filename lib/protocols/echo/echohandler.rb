@@ -1,8 +1,8 @@
-require 'genesis_handler'
+require 'genesis/handler'
 require 'echoprotocol'
 
 # A test handler to demonstrate functionality and facilitate testing
-class EchoHandler < GenesisHandler
+class EchoHandler < Genesis::Handler
   include EchoProtocol
 
   class << self

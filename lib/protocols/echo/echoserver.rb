@@ -1,11 +1,9 @@
-require 'eventmachine'
-
-require 'genesis_server'
+require 'genesis/server'
 require 'echoprotocol'
 
 # Implement a test server to demonstrate functionality and facilitate testing
 class EchoServer < EM::Connection
-  include GenesisServer
+  include Genesis::Server
   include EchoProtocol
   def receive_data(data)
     @channel << data

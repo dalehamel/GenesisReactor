@@ -1,8 +1,8 @@
-require 'genesis_handler'
+require 'genesis/handler'
 require 'httpprotocol'
 
 # Handle various HTTP verbs
-class HttpHandler < GenesisHandler
+class HttpHandler < Genesis::Handler
   include HttpProtocol
 
   class << self
