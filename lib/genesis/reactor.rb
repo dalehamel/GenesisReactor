@@ -13,11 +13,13 @@ require 'em-synchrony'
 
 module Genesis
   # Main reactor class
+  # rubocop:disable ClassLength
   class Reactor
     def initialize(**kwargs)
       reset
       @poolsize = kwargs[:threads] || 100 # maximum concurrency - larger = longer boot and shutdown time
       @protocols = kwargs[:protocols] || {}
+      @agents = kwargs[:agents] || []
       register_handlers(kwargs[:handlers] || {})
     end
 
@@ -34,7 +36,6 @@ module Genesis
         initialize_protocols
         initialize_threadpool
         initialize_servers
-        initialize_agents
         initialize_sighandlers
         return true
       else
@@ -81,6 +82,7 @@ module Genesis
         @channels[protocol.protocol] = server[:server].start(server[:port], @routes[protocol.protocol], &block)
       end
       initialize_subscribers
+      initialize_agents
     end
 
     # Initialize protocols to be handled
@@ -96,15 +98,12 @@ module Genesis
       EM.threadpool_size = @poolsize
     end
 
-    # FIXME: actually do this
     def initialize_agents
-      # EM.add_periodic_timer(1) do # test
-      #   EM.defer do
-      #     puts "Timer fired"
-      #     sleep 5
-      #     puts "Done"
-      #   end
-      # end
+      @agents.each do |agent|
+        EM.add_periodic_timer(agent[:interval]) do
+          EM.defer { agent[:block].call(@channels[agent.protocol]) }
+        end
+      end
     end
 
     # Set up subscriptions to channels
