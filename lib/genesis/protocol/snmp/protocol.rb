@@ -7,7 +7,6 @@ module Genesis
       end
 
       def self.load
-        require 'snmpserver'
         Server
       end
 

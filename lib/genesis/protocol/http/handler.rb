@@ -1,5 +1,4 @@
 require 'genesis/handler'
-require 'httpprotocol'
 
 module Genesis
   module Http

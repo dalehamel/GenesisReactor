@@ -8,7 +8,6 @@ module Genesis
       end
 
       def self.load
-        require 'httpserver'
         Server
       end
 

@@ -1,5 +1,4 @@
 require 'genesis/handler'
-require 'snmpprotocol'
 
 module Genesis
   module Snmp

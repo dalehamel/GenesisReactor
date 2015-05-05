@@ -2,7 +2,6 @@ require 'sinatra/async'
 require 'thin'
 
 require 'genesis/server'
-require 'httpprotocol'
 require 'async_monkeypatch'
 
 module Genesis

@@ -1,7 +1,6 @@
 require 'snmp'
 
 require 'genesis/server'
-require 'snmpprotocol'
 
 module Genesis
   module Snmp
