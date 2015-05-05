@@ -1,14 +1,3 @@
-# Testing
-
-+ Write core tests for the reactor using echo protocol
- + Registering routes, channels etc work as expected
-
-+ Write agent module and tests (try and do this TDD)
- + Something to schedule work (schedule DSL command?)
- + Something to make a request
-  + (think, provide accesses to snmp get/set
-  + provide access to http get/post/patch and other verbs
-
 # Next up
 
 + Implement SNMP trap handler (handle specific trap OID by decoding PDU... maybe make symbolic, maybe not)
