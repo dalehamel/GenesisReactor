@@ -35,7 +35,6 @@ module Genesis
       if running?
         initialize_protocols
         initialize_threadpool
-        initialize_servers
         initialize_sighandlers
         return true
       else
@@ -79,18 +78,20 @@ module Genesis
       @protocols.each do |protocol, _|
         server = @servers[protocol.protocol]
         block = server[:start]
-        @channels[protocol.protocol] = server[:server].start(server[:port], @routes[protocol.protocol], &block)
+        server[:server].start(server[:port], @routes[protocol.protocol], channel: @channels[protocol.protocol], &block)
       end
-      initialize_subscribers
-      initialize_agents
     end
 
     # Initialize protocols to be handled
     def initialize_protocols
       @protocols.each do |protocol, _|
-        server = protocol.load
+        server = protocol.server
         @servers[protocol.protocol] = { server: server, port: @protocols[protocol], start: protocol.start_block }
+        @channels[protocol.protocol] =  EM::Channel.new
       end
+      initialize_servers
+      initialize_subscribers
+      initialize_agents
     end
 
     # Sets the initial size of the threadpool

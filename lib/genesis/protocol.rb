@@ -8,7 +8,7 @@ module Genesis
           base.define_singleton_method(:protocol) { protocol.protocol }
         end
 
-        def load
+        def server
           Kernel.const_get((to_s.split('::')[0..-2] << 'Server').join('::'))
         end
 

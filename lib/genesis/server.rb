@@ -14,7 +14,7 @@ module Genesis
       def start(port, routes, **kwargs, &block)
         @port = port
         @handle_routes = routes || []
-        @channel = EM::Channel.new
+        @channel = kwargs[:channel]
         @args = kwargs
 
         # Allow a custom, non EM, server to be run
@@ -23,7 +23,6 @@ module Genesis
         else
           default_start
         end
-        @channel
       end
 
       private
