@@ -19,8 +19,8 @@ module Genesis
       reset
       @poolsize = kwargs[:threads] || 100 # maximum concurrency - larger = longer boot and shutdown time
       @protocols = kwargs[:protocols] || {}
-      @agents = kwargs[:agents] || []
       register_handlers(kwargs[:handlers] || {})
+      register_agents(kwargs[:agents] || [])
     end
 
     # Convenience wrapper to run indefinitely as daemon
@@ -98,10 +98,13 @@ module Genesis
       EM.threadpool_size = @poolsize
     end
 
+    # Sets up agents
     def initialize_agents
-      @agents.each do |agent|
-        EM.add_periodic_timer(agent[:interval]) do
-          EM.defer { agent[:block].call(@channels[agent.protocol]) }
+      @agents.each do |protocol, agents|
+        agents.each do |data|
+          EM.add_periodic_timer(data[:interval]) do
+            EM.defer { data[:block].call(@channels[protocol]) }
+          end
         end
       end
     end
@@ -133,6 +136,15 @@ module Genesis
       end
     end
 
+    # Registers all agenst
+    def register_agents(agents)
+      agents.each do |agent|
+        (agent.agents || {}).each do |data|
+          register_agent(agent.protocol, data)
+        end
+      end
+    end
+
     # Registers a route for a given protocol
     def register_route(protocol, verb, match, args, block)
       @routes[protocol] ||= {}
@@ -148,8 +160,8 @@ module Genesis
 
     # Registers an agent for a given protocol
     def register_agent(protocol, method)
-      @agent[protocol] ||= []
-      @agent[protocol] << method
+      @agents[protocol] ||= []
+      @agents[protocol] << method
     end
   end
 end

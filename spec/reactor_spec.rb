@@ -25,7 +25,7 @@ RSpec.describe Reactor do
   context 'handlers' do
     it 'can register a route for a protocol' do
       # Simple class registering one route
-      class TestRegisterRouteEchoHandler < Echo::Handler
+      class TestRegisterRoute < Echo::Handler
         say /test/ do |message|
           "test handler routed #{message}"
         end
@@ -35,7 +35,7 @@ RSpec.describe Reactor do
         protocols: {
           Echo::Protocol => port
         },
-        handlers: [TestRegisterRouteEchoHandler]
+        handlers: [TestRegisterRoute]
       )
 
       reactor.run
@@ -44,9 +44,9 @@ RSpec.describe Reactor do
 
     it 'can register a subscriber for a protocol' do
       # Simple class registering one subscriber
-      class TestRegisterSubscriberEchoHandler < Echo::Handler
+      class TestRegisterSubscriber < Echo::Handler
         subscribe 'test' do |message|
-          puts "test handler got #{message}"
+          puts "test subscriber got #{message}"
         end
       end
 
@@ -54,19 +54,59 @@ RSpec.describe Reactor do
         protocols: {
           Echo::Protocol => port
         },
-        handlers: [TestRegisterSubscriberEchoHandler]
+        handlers: [TestRegisterSubscriber]
       )
 
       reactor.run
       expect do
         send_to_port('test', port)
         wait_async(1)
-      end.to output("test handler got test\n").to_stdout
+      end.to output("test subscriber got test\n").to_stdout
     end
   end
 
   context 'agents' do
     it 'can register an agent for a protocol' do
+
+      class TestAgentRegistration < Echo::Agent
+        schedule interval: 1 do |channel|
+          puts 'scheduled'
+        end
+      end
+
+      reactor = Reactor.new(
+        agents: [TestAgentRegistration]
+      )
+      expect do
+        reactor.run
+        wait_async(3)
+      end.to output(/scheduled\nscheduled\n/).to_stdout
     end
+
+    it 'can register an agent with a subscriber' do
+
+      class TestAgentProducer < Echo::Agent
+        schedule interval: 1 do |channel|
+          channel << 'scheduled'
+        end
+      end
+
+      class TestAgentSubscriber < Echo::Handler
+        subscribe 'test subscription' do |message|
+          puts "test subscriber got #{message}"
+        end
+      end
+
+      reactor = Reactor.new(
+        protocols: {Echo::Protocol => port},
+        handlers: [TestAgentSubscriber],
+        agents: [TestAgentProducer]
+      )
+      expect do
+        reactor.run
+        wait_async(3)
+      end.to output(/test subscriber got scheduled\ntest subscriber got scheduled\n/).to_stdout
+    end
+
   end
 end
