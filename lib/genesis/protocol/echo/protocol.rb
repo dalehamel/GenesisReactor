@@ -7,6 +7,7 @@ module Genesis
     # In keeping with event machine tradition, it's a simple 'echo' protocol.
     module Protocol
       include Genesis::Protocol
+
       def self.protocol
         :echo
       end
