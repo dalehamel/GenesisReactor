@@ -5,7 +5,7 @@ module Genesis
     # Implement a test server to demonstrate functionality and facilitate testing
     class Server < EM::Connection
       include Genesis::Server
-      include Echo::Protocol
+      include Protocol
       def receive_data(data)
         @channel << data
         @handle_routes.each do |verb, matchdata|
