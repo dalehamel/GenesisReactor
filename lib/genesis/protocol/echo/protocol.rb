@@ -9,7 +9,6 @@ module Genesis
       end
 
       def self.load
-        require 'echoserver'
         Server
       end
 

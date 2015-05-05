@@ -1,12 +1,11 @@
 require 'genesis/server'
-require 'genesis/echoprotocol'
 
 module Genesis
   module Echo
     # Implement a test server to demonstrate functionality and facilitate testing
     class Server < EM::Connection
       include Genesis::Server
-      include Protocol
+      include Echo::Protocol
       def receive_data(data)
         @channel << data
         @handle_routes.each do |verb, matchdata|

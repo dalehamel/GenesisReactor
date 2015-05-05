@@ -1,5 +1,4 @@
 require 'genesis/handler'
-require 'genesis/echoprotocol'
 
 module Genesis
   module Echo
