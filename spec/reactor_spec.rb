@@ -67,9 +67,9 @@ RSpec.describe Reactor do
 
   context 'agents' do
     it 'can register an agent for a protocol' do
-
+      # Test that an agent can be registered and periodically called
       class TestAgentRegistration < Echo::Agent
-        schedule interval: 1 do |channel|
+        schedule interval: 1 do
           puts 'scheduled'
         end
       end
@@ -84,13 +84,14 @@ RSpec.describe Reactor do
     end
 
     it 'can register an agent with a subscriber' do
-
+      # Test producitng to a channel from an agent
       class TestAgentProducer < Echo::Agent
         schedule interval: 1 do |channel|
           channel << 'scheduled'
         end
       end
 
+      # Test subscribing to a channel for an agent
       class TestAgentSubscriber < Echo::Handler
         subscribe 'test subscription' do |message|
           puts "test subscriber got #{message}"
@@ -98,7 +99,7 @@ RSpec.describe Reactor do
       end
 
       reactor = Reactor.new(
-        protocols: {Echo::Protocol => port},
+        protocols: { Echo::Protocol => port },
         handlers: [TestAgentSubscriber],
         agents: [TestAgentProducer]
       )
@@ -107,6 +108,5 @@ RSpec.describe Reactor do
         wait_async(3)
       end.to output(/test subscriber got scheduled\ntest subscriber got scheduled\n/).to_stdout
     end
-
   end
 end

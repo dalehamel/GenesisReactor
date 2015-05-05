@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = 'GenesisReactor provides a protocol agnostic framework for implementing simple pub/sub message production and handling.'
   s.authors     = ['Dale Hamel']
   s.email       = 'dale.hamel@srvthe.net'
-  s.files       = Dir["lib/**/*"]
+  s.files       = Dir['lib/**/*']
   s.homepage    =
     'http://rubygems.org/gems/genesisreactor'
   s.license       = 'MIT'
