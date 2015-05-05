@@ -3,18 +3,16 @@ Gem::Specification.new do |s|
   s.version     = '0.0.0'
   s.date        = '2015-04-26'
   s.summary     = 'Event driven infrastructor automation framework'
-  s.description = 'A simple hello world gem'
+  s.description = 'GenesisReactor provides a protocol agnostic framework for implementing simple pub/sub message production and handling.'
   s.authors     = ['Dale Hamel']
   s.email       = 'dale.hamel@srvthe.net'
-  s.files       = ['lib/genesisreactor.rb', 'lib/genesisreactor/servers/httpserver.rb', 'lib/genesisreactor/servers/echoserver.rb']
+  s.files       = Dir["lib/**/*"]
   s.homepage    =
     'http://rubygems.org/gems/genesisreactor'
   s.license       = 'MIT'
-  s.add_runtime_dependency 'eventmachine'
-  s.add_runtime_dependency 'em-http-request'
-  s.add_runtime_dependency 'em-synchrony'
-  s.add_runtime_dependency 'async_sinatra'
-  s.add_runtime_dependency 'thin'
-  s.add_runtime_dependency 'snmp'
-  s.add_development_dependency 'rspec'
+  s.add_runtime_dependency 'em-synchrony', ['=1.0.4']
+  s.add_runtime_dependency 'async_sinatra', ['=1.1.0']
+  s.add_runtime_dependency 'thin', ['=1.6.3']
+  s.add_runtime_dependency 'snmp', ['=1.2.0']
+  s.add_development_dependency 'rspec', ['=3.2.0']
 end
