@@ -9,6 +9,11 @@
     + Overriding timeouts somehow by passing argument to defer wrapper
 + Make sure that all modules force some sort of timeout somehow :wave: so that things don't block forever
 
+# Refactor
+
++ Server as a type of agent?
++ Figure out of agent can be merged into handler for simplicity, or if that's too weird
+
 # Gemify protocols
 
 + Make HTTP and SNMP their own gems
