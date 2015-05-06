@@ -33,7 +33,7 @@ module Genesis
     # end
 
     # # Walk an OID table rooted at any oids provided
-    # def self.get(oids = [], **kwargs)
+    # def self.walk(oids = [], **kwargs)
     #   manager(kwargs) do |mgr|
     #     mgr.walk(oids)
     #   end
