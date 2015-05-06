@@ -6,41 +6,30 @@ require 'genesis/server'
 module Genesis
   module Snmp
     # Implement an SNMP trap handling server
-    # Using SNMP::TrapListener as a prototype
-    # But, leverage event machine for it's non-blocking threadpool
-    # TODO: Upstream these changes
     class Server < EM::Connection
       include Genesis::Server
       include Protocol
 
-      attr_accessor :mib
+      attr_accessor :mib, :community
 
       def self.start_server
-        commstr = @args[:community] || 'public'
+        commstr = @args[:community] || ''
         mib_dir = @args[:mib_dir] || SNMP::MIB::DEFAULT_MIB_PATH
         mib_mods = @args[:mib_mods] || SNMP::Options.default_modules
         mib = load_modules(mib_mods, mib_dir)
         EM.open_datagram_socket('0.0.0.0', @port, self) do |conn|
           conn.mib = mib
+          conn.community = commstr
           conn.channel = @channel
           conn.handle_routes = @handle_routes
         end
-
-#        SNMP::TrapListener.new(host: '0.0.0.0', port: @port, community: commstr) do |manager|
-#          manager.on_trap_default do |snmp_trap|
-#            EM.defer do
-#              @channel << snmp_trap
-#              route_trap(snmp_trap)
-#            end
-#          end
-#        end
       end
 
       def receive_data(data)
         source_port, source_ip = Socket.unpack_sockaddr_in(get_peername)
 
         message = SNMP::Message.decode(data, @mib)
-        # FIXME: check community
+        close_connection if @community != '' && @community != message.community
         snmp_trap = message.pdu
 
         if snmp_trap.kind_of?(SNMP::InformRequest)
