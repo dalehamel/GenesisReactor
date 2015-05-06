@@ -6,9 +6,8 @@ RSpec.describe Snmp::Protocol do
 
   context 'trap handler' do
     it 'can receieve traps from channel' do
-
+      # Test that a channel can subscribe to traps
       class SnmpSubscriberTest < Snmp::Handler
-
         subscribe do |trap|
           puts "got a trap #{trap.trap_oid.join('.')}"
         end
@@ -16,22 +15,21 @@ RSpec.describe Snmp::Protocol do
 
       reactor = Genesis::Reactor.new(
         protocols: {
-          Snmp::Protocol => port,
+          Snmp::Protocol => port
         },
-        handlers: [SnmpSubscriberTest],
+        handlers: [SnmpSubscriberTest]
       )
 
       expect do
         reactor.run
-        Snmp::send_trap(1234, '1.3.6.1.2.3.4', trapport: port)
+        Snmp.send_trap(1234, '1.3.6.1.2.3.4', trapport: port)
         wait_async(2)
       end.to output(/got a trap 1.3.6.1.2.3.4/).to_stdout
     end
 
     it 'can handle a specific trap' do
-
+      # Test that a trap can be receieved and handled explicitly
       class SnmpTrapTest < Snmp::Handler
-
         trap '1.3.6.1.2.3.4' do |snmp_trap|
           puts "trapped #{snmp_trap.trap_oid.join('.')}"
         end
@@ -39,14 +37,14 @@ RSpec.describe Snmp::Protocol do
 
       reactor = Genesis::Reactor.new(
         protocols: {
-          Snmp::Protocol => port,
+          Snmp::Protocol => port
         },
-        handlers: [SnmpTrapTest],
+        handlers: [SnmpTrapTest]
       )
 
       expect do
         reactor.run
-        Snmp::send_trap(1234, '1.3.6.1.2.3.4', trapport: port)
+        Snmp.send_trap(1234, '1.3.6.1.2.3.4', trapport: port)
         wait_async(2)
       end.to output(/trapped 1.3.6.1.2.3.4/).to_stdout
     end

@@ -25,20 +25,40 @@ module Genesis
         end
       end
 
+      def self.load_modules(module_list, mib_dir)
+        mib = SNMP::MIB.new
+        module_list.each { |m| mib.load_module(m, mib_dir) }
+        mib
+      end
+
       def receive_data(data)
+        snmp_trap = handle_trap(data)
+        @channel << snmp_trap
+        route_trap(snmp_trap)
+      end
+
+      private
+
+      def handle_trap(data)
         source_port, source_ip = Socket.unpack_sockaddr_in(get_peername)
 
         message = SNMP::Message.decode(data, @mib)
-        close_connection if @community != '' && @community != message.community
         snmp_trap = message.pdu
 
-        if snmp_trap.kind_of?(SNMP::InformRequest)
-          UDPSocket.new.send(message.response.encode, 0, source_ip, source_port)
-        end
+        # If we configured a community and the message wasn't from our community, bail
+        close_connection if @community != '' && @community != message.community
 
+        # Handle inform requests, which want a response
+        handle_inform(snmp_trap, message, source_ip, source_port)
+
+        # Append source ip and return
         snmp_trap.source_ip = source_ip
-        @channel << snmp_trap
-        route_trap(snmp_trap)
+        snmp_trap
+      end
+
+      def handle_inform(snmp_trap, message, source_ip, source_port)
+        return unless snmp_trap.is_a?(SNMP::InformRequest)
+        UDPSocket.new.send(message.response.encode, 0, source_ip, source_port)
       end
 
       def route_trap(snmp_trap)
@@ -55,14 +75,6 @@ module Genesis
         matchdata.each do |oid, blockdata|
           blockdata[:block].call(snmp_trap) if  oid =~ /#{trap_oid}/
         end
-      end
-
-      private
-
-      def self.load_modules(module_list, mib_dir)
-        mib = SNMP::MIB.new
-        module_list.each { |m| mib.load_module(m, mib_dir) }
-        mib
       end
     end
   end
