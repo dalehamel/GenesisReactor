@@ -17,7 +17,9 @@ module Genesis
 
       def self.start_server
         commstr = @args[:community] || 'public'
-        mib = SNMP::MIB.new # FIXME: load mibs
+        mib_dir = @args[:mib_dir] || SNMP::MIB::DEFAULT_MIB_PATH
+        mib_mods = @args[:mib_mods] || SNMP::Options.default_modules
+        mib = load_modules(mib_mods, mib_dir)
         EM.open_datagram_socket('0.0.0.0', @port, self) do |conn|
           conn.mib = mib
           conn.channel = @channel
@@ -64,6 +66,14 @@ module Genesis
         matchdata.each do |oid, blockdata|
           blockdata[:block].call(snmp_trap) if  oid =~ /#{trap_oid}/
         end
+      end
+
+      private
+
+      def self.load_modules(module_list, mib_dir)
+        mib = SNMP::MIB.new
+        module_list.each { |m| mib.load_module(m, mib_dir) }
+        mib
       end
     end
   end
