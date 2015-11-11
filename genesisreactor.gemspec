@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'genesisreactor'
-  s.version     = '0.0.0'
+  s.version     = '0.0.1'
   s.date        = '2015-04-26'
   s.summary     = 'Event driven infrastructor automation framework'
   s.description = 'GenesisReactor provides a protocol agnostic framework for implementing simple pub/sub message production and handling.'
