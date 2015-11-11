@@ -1,3 +1,5 @@
+require 'genesis/protocol'
+
 module Genesis
   module Http
     # Implement support for HTTP protocol

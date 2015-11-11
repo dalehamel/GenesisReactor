@@ -14,7 +14,7 @@ module Genesis
 
       # Block to actually start the server
       def self.start_server
-        app = new(channel: @channel, routes: @handle_routes)
+        app = new(channel: @channel, routes: @handle_routes, views: @args[:views] || [])
         dispatch = Rack::Builder.app do
           map '/' do
             run app
@@ -31,6 +31,7 @@ module Genesis
         super(app)
         @channel = kwargs[:channel] || nil
         @extended_routes = kwargs[:routes] || {}
+        @views = kwargs[:views] || []
         initialize_routes
       end
 
@@ -55,6 +56,11 @@ module Genesis
         # Enable partial template rendering
         def partial(template, locals = {})
           erb(template, layout: false, locals: locals)
+        end
+
+        # Override template search directorys to add spells
+        def find_template(views, *a, &block)
+          Array(@views).each { |v| super(v, *a, &block) }
         end
 
         # Define our asynchronous scheduling mechanism, could be anything
