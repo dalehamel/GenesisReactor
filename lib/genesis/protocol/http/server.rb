@@ -1,4 +1,5 @@
 require 'sinatra/async'
+require 'tilt/erb'
 require 'thin'
 
 require 'genesis/server'

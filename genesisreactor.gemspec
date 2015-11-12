@@ -1,6 +1,10 @@
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'genesis/version'
+
 Gem::Specification.new do |s|
   s.name        = 'genesisreactor'
-  s.version     = '0.0.1'
+  s.version     = Genesis::VERSION
   s.date        = '2015-04-26'
   s.summary     = 'Event driven infrastructor automation framework'
   s.description = 'GenesisReactor provides a protocol agnostic framework for implementing simple pub/sub message production and handling.'
