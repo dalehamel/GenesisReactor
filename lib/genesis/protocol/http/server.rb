@@ -24,7 +24,7 @@ module Genesis
 
         # Since Thin is backed by EventMachine's TCPserver anyways,
         # This is just a TCPServer like any other - running inside the same EventMachine!
-        Thin::Server.new(@port, '0.0.0.0', dispatch).backend.start
+        Thin::Server.new(@port, '127.0.0.1', dispatch).backend.start
       end
 
       # Inject the channel and extended routes
