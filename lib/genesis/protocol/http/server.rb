@@ -22,6 +22,8 @@ module Genesis
           end
         end
 
+        # Enable full request logging with @debug
+        Thin::Logging.trace=true if @args[:debug]
         # Since Thin is backed by EventMachine's TCPserver anyways,
         # This is just a TCPServer like any other - running inside the same EventMachine!
         Thin::Server.new(@port, '0.0.0.0', dispatch).backend.start

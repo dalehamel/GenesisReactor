@@ -20,6 +20,7 @@ module Genesis
       @poolsize = kwargs[:threads] || 100 # maximum concurrency - larger = longer boot and shutdown time
       @protocols = kwargs[:protocols] || {}
       @views = kwargs[:views] || {}
+      @debug = kwargs[:debug] || false
       register_handlers(kwargs[:handlers] || {})
       register_agents(kwargs[:agents] || [])
     end
@@ -79,7 +80,7 @@ module Genesis
       @protocols.each do |protocol, _|
         server = @servers[protocol.protocol]
         block = server[:start]
-        server[:server].start(server[:port], @routes[protocol.protocol], views: @views, channel: @channels[protocol.protocol], &block)
+        server[:server].start(server[:port], @routes[protocol.protocol], views: @views, channel: @channels[protocol.protocol], debug: @debug, &block)
       end
     end
 
