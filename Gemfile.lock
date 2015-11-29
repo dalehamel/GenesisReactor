@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    genesisreactor (0.0.2)
+    genesisreactor (0.0.4)
       async_sinatra (= 1.1.0)
       em-synchrony (= 1.0.4)
       snmp (= 1.2.0)
