@@ -13,6 +13,7 @@ module Genesis
       include Protocol
       register Sinatra::Async
 
+      set :show_exceptions, ENV['DEBUG']
       # Block to actually start the server
       def self.start_server
         app = new(channel: @channel, routes: @handle_routes, views: @args[:views] || [])
